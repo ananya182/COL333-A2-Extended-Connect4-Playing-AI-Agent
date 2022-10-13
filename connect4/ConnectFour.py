@@ -173,7 +173,10 @@ class Game:
                                                f'popout left: {self.state[1][2].get_int()}')
 
     def update_board(self, column: int, player_num: int, is_popout: bool = False):
+
         board, num_popouts = self.state
+        print("Next move : Player:",player_num,"Column:",column,"Is_pop:",is_popout)
+
         if not is_popout:
             if 0 in board[:, column]:
                 for row in range(1, board.shape[0]):
@@ -201,6 +204,14 @@ class Game:
                 err = 'Invalid move by player {}. Column {}'.format(player_num, column)
                 raise Exception(err)
             num_popouts[player_num].decrement()
+        
+        print("\n", board, "\n")
+        s = ""
+        s += f'Player 1 Score: {get_pts(1, self.state[0])}\n'
+        s += f'Player 2 Score: {get_pts(2, self.state[0])}\n'
+        s += "-"*25
+        s += "\n"
+        print(s)
 
 
 def get_start_board(file_pth: str) -> Tuple[int, np.array]:
