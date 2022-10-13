@@ -4,6 +4,7 @@ import json
 import multiprocessing as mp
 import random
 import sys
+import time
 import tkinter as tk
 from datetime import datetime
 
@@ -173,6 +174,8 @@ class Game:
                                                f'popout left: {self.state[1][2].get_int()}')
 
     def update_board(self, column: int, player_num: int, is_popout: bool = False):
+
+        time.sleep(0.5)
 
         board, num_popouts = self.state
         print("Next move : Player:",player_num,"Column:",column,"Is_pop:",is_popout)

@@ -1,5 +1,6 @@
 import random
 import copy
+import time
 import numpy as np
 from typing import List, Tuple, Dict
 from connect4.utils import get_pts, get_valid_actions, Integer
@@ -19,7 +20,7 @@ class AIPlayer:
 
     def simulate_board(self, column: int, player_num: int, is_popout: bool, board, num_popouts):
     
-        print("Next move : Player:",player_num,"Column:",column,"Is_pop:",is_popout)
+        # print("Next move : Player:",player_num,"Column:",column,"Is_pop:",is_popout)
 
         if not is_popout:
             if 0 in board[:, column]:
@@ -49,8 +50,6 @@ class AIPlayer:
             # num_popouts[player_num].decrement()
         
         s = ""
-        # s += f'Player 1 Score: {get_pts(1, self.state[0])}\n'
-        # s += f'Player 2 Score: {get_pts(2, self.state[0])}\n'
 
     # def get_intelligent_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
 
@@ -77,8 +76,6 @@ class AIPlayer:
         board, num_popouts = state
         cumulative_benefit = 0
 
-        opt_action, opt_is_pop = valid_actions[0]
-
         for play_move in valid_actions:
 
             (act_column,is_pop) = play_move
@@ -95,14 +92,17 @@ class AIPlayer:
             else:
                 Score_random = get_pts(1, board_new)
 
-            cumulative_benefit += Score_ai - Score_random
+            cumulative_benefit += Score_ai - 2*Score_random
+
             if Score_ai==0:
                 percentage=cumulative_benefit
             else:
                 percentage=cumulative_benefit/Score_ai
-        print("Percent margin cumulative for player 2:",percentage*100)
 
-        return percentage
+        print("Percent margin cumulative for player 2:",percentage*100)
+        print("Benefit cumulative for player 2:",cumulative_benefit)
+
+        return cumulative_benefit
             # if(Score_ai - Score_random > cmax):
             #     opt_action, opt_is_pop = act_column, is_pop
 
@@ -159,12 +159,15 @@ class AIPlayer:
 
             print("Score difference for player 1:",Score_ai - Score_random)
 
-            if(cumulative_benefit > cmax):
-                opt_action, opt_is_pop = act_column, is_pop
-                cmax = cumulative_benefit
+            if Score_random == 0 :
+                Score_random = 1
 
-        # action, is_popout = random.choice(valid_actions)
+            if(cumulative_benefit/Score_random > cmax):
+                opt_action, opt_is_pop = act_column, is_pop
+                cmax = cumulative_benefit/Score_random
+
         action, is_popout =  opt_action, opt_is_pop
+        # time.sleep(1)
 
         return action, is_popout
 
