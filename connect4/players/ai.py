@@ -96,9 +96,13 @@ class AIPlayer:
                 Score_random = get_pts(1, board_new)
 
             cumulative_benefit += Score_ai - Score_random
-        print("Score difference cumulative for player 2:",cumulative_benefit)
+            if Score_ai==0:
+                percentage=cumulative_benefit
+            else:
+                percentage=cumulative_benefit/Score_ai
+        print("Percent margin cumulative for player 2:",percentage*100)
 
-        return cumulative_benefit
+        return percentage
             # if(Score_ai - Score_random > cmax):
             #     opt_action, opt_is_pop = act_column, is_pop
 
