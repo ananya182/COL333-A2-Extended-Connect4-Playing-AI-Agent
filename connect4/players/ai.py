@@ -95,8 +95,8 @@ class AIPlayer:
             else:
                 Score_random = get_pts(1, board_new)
 
-            print("Score difference",Score_ai - Score_random)
             cumulative_benefit += Score_ai - Score_random
+        print("Score difference cumulative for player 2:",cumulative_benefit)
 
         return cumulative_benefit
             # if(Score_ai - Score_random > cmax):
@@ -153,10 +153,11 @@ class AIPlayer:
             else:
                 Score_random = get_pts(1, board_new)
 
-            print("Score difference",Score_ai - Score_random)
+            print("Score difference for player 1:",Score_ai - Score_random)
 
             if(cumulative_benefit > cmax):
                 opt_action, opt_is_pop = act_column, is_pop
+                cmax = cumulative_benefit
 
         # action, is_popout = random.choice(valid_actions)
         action, is_popout =  opt_action, opt_is_pop
