@@ -3,6 +3,8 @@ import numpy as np
 from typing import List, Tuple, Dict
 from connect4.utils import get_pts, get_valid_actions, Integer
 
+import copy
+
 
 class AIPlayer:
     def __init__(self, player_number: int, time: int):
@@ -16,9 +18,8 @@ class AIPlayer:
         self.time = time
         # Do the rest of your implementation here
 
-    def simulate_board(self, column: int, player_num: int, is_popout: bool = False):
+    def simulate_board(self, column: int, player_num: int, is_popout: bool, board, num_popouts):
     
-        board, num_popouts = self.state
         print("Next move : Player:",player_num,"Column:",column,"Is_pop:",is_popout)
 
         if not is_popout:
@@ -31,7 +32,7 @@ class AIPlayer:
                         update_row = row
                     if update_row >= 0:
                         board[update_row, column] = player_num
-                        self.c.itemconfig(self.gui_board[column][update_row], fill=self.colors[self.current_turn + 1])
+                        # print("New board", board)
                         break
             else:
                 err = 'Invalid move by player {}. Column {}'.format(player_num, column, is_popout)
@@ -40,24 +41,19 @@ class AIPlayer:
             if 1 in board[:, column] or 2 in board[:, column]:
                 for r in range(board.shape[0] - 1, 0, -1):
                     board[r, column] = board[r - 1, column]
-                    self.c.itemconfig(self.gui_board[column][r], fill=self.colors[
-                        board[r, column]])  # this needs to be tweaked
                 board[0, column] = 0
-                self.c.itemconfig(self.gui_board[column][0], fill=self.colors[0])
+                # print("New board", board)
             else:
                 err = 'Invalid move by player {}. Column {}'.format(player_num, column)
                 raise Exception(err)
             num_popouts[player_num].decrement()
         
-        print("\n", board, "\n")
         s = ""
-        s += f'Player 1 Score: {get_pts(1, self.state[0])}\n'
-        s += f'Player 2 Score: {get_pts(2, self.state[0])}\n'
-        s += "-"*25
-        s += "\n"
-        print(s)
+        # s += f'Player 1 Score: {get_pts(1, self.state[0])}\n'
+        # s += f'Player 2 Score: {get_pts(2, self.state[0])}\n'
 
-    def get_intelligent_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
+    # def get_intelligent_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
+
         """
         Given the current state of the board, return the next move
         This will play against either itself or a human player
@@ -76,6 +72,7 @@ class AIPlayer:
         # raise NotImplementedError('Whoops I don\'t know what to do')
 
     def get_expectimax_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
+        
         """
         Given the current state of the board, return the next move based on
         the Expecti max algorithm.
@@ -96,16 +93,33 @@ class AIPlayer:
         # Do the rest of your implementation here
 
         valid_actions = get_valid_actions(self.player_number, state)
+        cmax = 0
+        print(valid_actions)
+        opt_action, opt_is_pop = valid_actions[0]
 
-        # for (act,is_pop) in valid_actions:
-        #     board, num_popout = state
-        #     board_new = copy.deepcopy(board)
-        #     if(!is_pop):
-        #         board
-        #     state.
-    
+        for x in valid_actions:
 
-        action, is_popout = random.choice(valid_actions)
+            (act_column,is_pop) = x
+            board, num_popout = state
+            board_new = copy.deepcopy(board)
+            num_popout_new = copy.deepcopy(num_popout)
+
+            self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout)
+
+            Score_ai = get_pts(self.player_number, board_new)
+
+            if(self.player_number == 1):
+                Score_random = get_pts(2, board_new)
+            else:
+                Score_random = get_pts(1, board_new)
+
+            print("Score difference",Score_ai - Score_random)
+
+            if(Score_ai - Score_random > cmax):
+                opt_action, opt_is_pop = act_column, is_pop
+
+        # action, is_popout = random.choice(valid_actions)
+        action, is_popout =  opt_action, opt_is_pop
 
         return action, is_popout
 
