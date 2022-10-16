@@ -55,19 +55,21 @@ class AIPlayer:
     def eval_function(self, state, player_num, s):
 
         if s=="min":
+            #print("eval : ", get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]))
             return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
         else:
+            #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
             return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
 
     
-    def min_value(self, state, player_num, depth, limit):
+    def min_value(self, state, player_num, depth, limit, alpha, beta):
 
         if depth>=limit:
             return self.eval_function(state,player_num,"min")
     
 
         valid_actions = get_valid_actions((player_num*2)%3, state)
-        min=-np.inf
+        min=np.inf
         
         for play_move in valid_actions:
 
@@ -79,16 +81,22 @@ class AIPlayer:
 
             self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
 
-            cur_val = self.max_value(state_new,player_num,depth+1,limit) 
+            cur_val = self.max_value(state_new,player_num,depth+1,limit,alpha,beta) 
+            
 
             if cur_val<min:
                 min=cur_val
+            if min<=alpha:
+                return min
+            if min<beta:
+                beta=min
+            
                 
-                
+        #print("min:",min)        
         return min
 
 
-    def max_value(self, state, player_num, depth, limit):
+    def max_value(self, state, player_num, depth, limit, alpha, beta):
 
         if depth>=limit:
             return self.eval_function(state,player_num,"max")
@@ -107,13 +115,18 @@ class AIPlayer:
 
             self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
 
-            cur_val = self.min_value(state_new,player_num,depth+1,limit) # (action, value)
+            cur_val = self.min_value(state_new,player_num,depth+1,limit,alpha,beta) # (action, value)
+            
 
             if cur_val>max:
                 max=cur_val
+            if max>=beta:
+                return max
+            if max>alpha:
+                alpha =max
                
-                
-        return cur_val
+        #print("max",max)        
+        return max
 
     def terminal_test(self, state, player_num):
         valid_actions = get_valid_actions((player_num*2)%3, state)
@@ -139,9 +152,9 @@ class AIPlayer:
 
         # Do the rest of your implementation here
         valid_actions = get_valid_actions(self.player_number, state)
-        min=-np.inf
+        min=np.inf
         opt_action=valid_actions[0]
-        for limit in range(3):
+        for limit in range(5):
             for play_move in valid_actions:
                 
                 (act_column,is_pop) = play_move
@@ -152,10 +165,11 @@ class AIPlayer:
                 self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
                 state_new = board_new, num_popout_new
 
-                if self.min_value(state_new, self.player_number, 0, limit)<min:
+                if self.min_value(state_new, self.player_number, 0, limit,0,0)<min:
                     opt_action=play_move
-                    min=self.min_value(state_new, self.player_number, 0, limit)
+                    min=self.min_value(state_new, self.player_number, 0, limit, 0, 0)
             
+        print(opt_action)
         return opt_action
         #print("Score difference for player 1:",Score_ai - Score_random)
     
