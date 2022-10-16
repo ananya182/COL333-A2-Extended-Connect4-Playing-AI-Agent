@@ -150,7 +150,7 @@ class AIPlayer:
         :return: action (0 based index of the column and if it is a popout move)
         """
 
-   
+        # Do the rest of your implementation here
         valid_actions = get_valid_actions(self.player_number, state)
         min=np.inf
         opt_action=valid_actions[0]
