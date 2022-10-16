@@ -1,3 +1,4 @@
+from ftplib import MAXLINE
 import random
 import copy
 import time
@@ -50,8 +51,76 @@ class AIPlayer:
             # num_popouts[player_num].decrement()
         
         s = ""
+    
+    def eval_function(self, state, player_num, s):
 
-    # def get_intelligent_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
+        if s=="min":
+            return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
+        else:
+            return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
+
+    
+    def min_value(self, state, player_num, depth, limit):
+
+        if depth>=limit:
+            return self.eval_function(state,player_num,"min")
+    
+
+        valid_actions = get_valid_actions((player_num*2)%3, state)
+        min=-np.inf
+        
+        for play_move in valid_actions:
+
+            (act_column,is_pop) = play_move
+            board, num_popout = state
+            board_new = copy.deepcopy(board)
+            num_popout_new = copy.deepcopy(num_popout)
+            state_new=(board_new,num_popout_new)
+
+            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
+
+            cur_val = self.max_value(state_new,player_num,depth+1,limit) 
+
+            if cur_val<min:
+                min=cur_val
+                
+                
+        return min
+
+
+    def max_value(self, state, player_num, depth, limit):
+
+        if depth>=limit:
+            return self.eval_function(state,player_num,"max")
+    
+
+        valid_actions = get_valid_actions((player_num*2)%3, state)
+        max=0
+        
+        for play_move in valid_actions:
+
+            (act_column,is_pop) = play_move
+            board, num_popout = state
+            board_new = copy.deepcopy(board)
+            num_popout_new = copy.deepcopy(num_popout)
+            state_new=(board_new,num_popout_new)
+
+            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
+
+            cur_val = self.min_value(state_new,player_num,depth+1,limit) # (action, value)
+
+            if cur_val>max:
+                max=cur_val
+               
+                
+        return cur_val
+
+    def terminal_test(self, state, player_num):
+        valid_actions = get_valid_actions((player_num*2)%3, state)
+        if(len[valid_actions]==1):
+            return True
+
+    def get_intelligent_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
 
         """
         Given the current state of the board, return the next move
@@ -67,9 +136,34 @@ class AIPlayer:
                         2. Dictionary of int to Integer. It will tell the remaining popout moves given a player
         :return: action (0 based index of the column and if it is a popout move)
         """
+
         # Do the rest of your implementation here
+        valid_actions = get_valid_actions(self.player_number, state)
+        min=-np.inf
+        opt_action=valid_actions[0]
+        for limit in range(3):
+            for play_move in valid_actions:
+                
+                (act_column,is_pop) = play_move
+                board, num_popout = state
+                board_new = copy.deepcopy(board)
+                num_popout_new = copy.deepcopy(num_popout)
+
+                self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
+                state_new = board_new, num_popout_new
+
+                if self.min_value(state_new, self.player_number, 0, limit)<min:
+                    opt_action=play_move
+                    min=self.min_value(state_new, self.player_number, 0, limit)
+            
+        return opt_action
+        #print("Score difference for player 1:",Score_ai - Score_random)
+    
+
         # raise NotImplementedError('Whoops I don\'t know what to do')
 
+
+            
     def do_player_move_random(self, state, player_num):
 
         valid_actions = get_valid_actions(player_num, state)
@@ -108,7 +202,7 @@ class AIPlayer:
 
         # action, is_popout = random.choice(valid_actions)
         # action, is_popout =  opt_action, opt_is_pop
-
+    
     def get_expectimax_move(self, state: Tuple[np.array, Dict[int, Integer]]) -> Tuple[int, bool]:
         
         """
