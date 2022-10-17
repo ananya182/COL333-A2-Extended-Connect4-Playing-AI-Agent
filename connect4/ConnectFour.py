@@ -175,7 +175,7 @@ class Game:
 
     def update_board(self, column: int, player_num: int, is_popout: bool = False):
 
-        time.sleep(0.5)
+        time.sleep(0.25)
 
         board, num_popouts = self.state
         print("Next move : Player:",player_num,"Column:",column,"Is_pop:",is_popout)

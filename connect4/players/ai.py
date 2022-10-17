@@ -54,22 +54,22 @@ class AIPlayer:
     
     def eval_function(self, state, player_num, s):
 
-        if s=="min":
-            #print("eval : ", get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]))
-            return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
-        else:
-            #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
-            return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
+        # if s=="min":
+        #     #print("eval : ", get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]))
+        #     return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
+        # else:
+        #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
+        #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
+        return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
 
     
     def min_value(self, state, player_num, depth, limit, alpha, beta):
 
-        if depth>=limit:
-            return self.eval_function(state,player_num,"min")
+        if depth >= limit:
+            return self.eval_function(state, self.player_number, "min")
     
-
-        valid_actions = get_valid_actions((player_num*2)%3, state)
-        min=np.inf
+        valid_actions = get_valid_actions((player_num*2)%3, state) #player 2 moves now
+        min_val = np.inf
         
         for play_move in valid_actions:
 
@@ -77,33 +77,30 @@ class AIPlayer:
             board, num_popout = state
             board_new = copy.deepcopy(board)
             num_popout_new = copy.deepcopy(num_popout)
-            state_new=(board_new,num_popout_new)
 
-            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
+            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new) #simulating the board for player 2's move
+            state_new = (board_new,num_popout_new)
 
-            cur_val = self.max_value(state_new,player_num,depth+1,limit,alpha,beta) 
+            cur_val = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta) #simulating the move of the next player
+
+            # print(cur_val)
             
-
-            if cur_val<min:
-                min=cur_val
-            if min<=alpha:
-                return min
-            if min<beta:
-                beta=min
+            min_val = min(min_val, cur_val)
+            beta = min(min_val, beta)
+            if beta <= alpha: #alpha beta pruning
+                return min_val
             
-                
         #print("min:",min)        
-        return min
+        return min_val
 
 
     def max_value(self, state, player_num, depth, limit, alpha, beta):
 
-        if depth>=limit:
+        if depth >= limit:
             return self.eval_function(state,player_num,"max")
     
-
-        valid_actions = get_valid_actions((player_num*2)%3, state)
-        max=0
+        valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
+        max_val = -1 * np.inf
         
         for play_move in valid_actions:
 
@@ -111,22 +108,19 @@ class AIPlayer:
             board, num_popout = state
             board_new = copy.deepcopy(board)
             num_popout_new = copy.deepcopy(num_popout)
-            state_new=(board_new,num_popout_new)
 
             self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
+            state_new = (board_new,num_popout_new)
 
-            cur_val = self.min_value(state_new,player_num,depth+1,limit,alpha,beta) # (action, value)
+            cur_val = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta) # (action, value)
             
-
-            if cur_val>max:
-                max=cur_val
-            if max>=beta:
-                return max
-            if max>alpha:
-                alpha =max
+            max_val = max(cur_val, max_val)
+            alpha = max(max_val, alpha)
+            if alpha >= beta: #alpha beta pruning
+                return max_val
                
         #print("max",max)        
-        return max
+        return max_val
 
     def terminal_test(self, state, player_num):
         valid_actions = get_valid_actions((player_num*2)%3, state)
@@ -151,10 +145,16 @@ class AIPlayer:
         """
 
         # Do the rest of your implementation here
+        start = time.time()
+
         valid_actions = get_valid_actions(self.player_number, state)
-        min=np.inf
-        opt_action=valid_actions[0]
-        for limit in range(5):
+        min_val = -1 * np.inf
+        opt_action = valid_actions[0]
+
+        for limit in range(7):
+
+            min_val = -1 * np.inf
+
             for play_move in valid_actions:
                 
                 (act_column,is_pop) = play_move
@@ -165,11 +165,21 @@ class AIPlayer:
                 self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
                 state_new = board_new, num_popout_new
 
-                if self.min_value(state_new, self.player_number, 0, limit,0,0)<min:
-                    opt_action=play_move
-                    min=self.min_value(state_new, self.player_number, 0, limit, 0, 0)
-            
-        print(opt_action)
+                new_min = self.min_value(state_new, self.player_number, 0, limit, -np.inf, np.inf)
+
+                if  new_min > min_val:
+                    opt_action_curr = play_move
+                    min_val = new_min
+                # print("New min:", new_min)
+                # print(play_move)
+                
+            #if this depth could be completed
+            opt_action = opt_action_curr
+            min_val = new_min
+        
+        end = time.time()
+        print(opt_action, "Time :", round(end - start,6),"secs")
+
         return opt_action
         #print("Score difference for player 1:",Score_ai - Score_random)
     
@@ -192,6 +202,7 @@ class AIPlayer:
             num_popout_new = copy.deepcopy(num_popout)
 
             self.simulate_board(act_column, player_num, is_pop, board_new, num_popout)
+            state_new = board_new, num_popout_new
 
             Score_ai = get_pts(self.player_number, board_new)
 
