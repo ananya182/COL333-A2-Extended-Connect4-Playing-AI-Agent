@@ -150,32 +150,45 @@ class AIPlayer:
         valid_actions = get_valid_actions(self.player_number, state)
         min_val = -1 * np.inf
         opt_action = valid_actions[0]
+        limit = 1
 
-        for limit in range(7):
+        while True:
+            limit += 1
 
-            min_val = -1 * np.inf
+            try :
 
-            for play_move in valid_actions:
-                
-                (act_column,is_pop) = play_move
-                board, num_popout = state
-                board_new = copy.deepcopy(board)
-                num_popout_new = copy.deepcopy(num_popout)
+            # for limit in range(5):
 
-                self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
-                state_new = board_new, num_popout_new
+                min_val = -1 * np.inf
 
-                new_min = self.min_value(state_new, self.player_number, 0, limit, -np.inf, np.inf)
+                for play_move in valid_actions:
+                    
+                    (act_column,is_pop) = play_move
+                    board, num_popout = state
+                    board_new = copy.deepcopy(board)
+                    num_popout_new = copy.deepcopy(num_popout)
 
-                if  new_min > min_val:
-                    opt_action_curr = play_move
-                    min_val = new_min
-                # print("New min:", new_min)
-                # print(play_move)
-                
-            #if this depth could be completed
-            opt_action = opt_action_curr
-            min_val = new_min
+                    self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
+                    state_new = board_new, num_popout_new
+
+                    new_min = self.min_value(state_new, self.player_number, 0, limit, -np.inf, np.inf)
+                    
+                    if((time.time() - start.time() )< 0.01):
+                        raise Exception
+
+
+                    if  new_min > min_val:
+                        opt_action_curr = play_move
+                        min_val = new_min
+                    # print("New min:", new_min)
+                    # print(play_move)
+                    
+                #if this depth could be completed
+                opt_action = opt_action_curr
+                min_val = new_min
+            
+            except Exception as e :
+                return opt_action
         
         end = time.time()
         print(opt_action, "Time :", round(end - start,6),"secs")
