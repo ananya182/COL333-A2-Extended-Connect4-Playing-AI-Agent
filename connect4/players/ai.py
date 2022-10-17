@@ -63,64 +63,83 @@ class AIPlayer:
         return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
 
     
-    def min_value(self, state, player_num, depth, limit, alpha, beta):
-
-        if depth >= limit:
-            return self.eval_function(state, self.player_number, "min")
-    
-        valid_actions = get_valid_actions((player_num*2)%3, state) #player 2 moves now
-        min_val = np.inf
+    def min_value(self, state, player_num, depth, limit, alpha, beta, start):
+        try:
+            if depth >= limit:
+                return self.eval_function(state, self.player_number, "min")
         
-        for play_move in valid_actions:
-
-            (act_column,is_pop) = play_move
-            board, num_popout = state
-            board_new = copy.deepcopy(board)
-            num_popout_new = copy.deepcopy(num_popout)
-
-            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new) #simulating the board for player 2's move
-            state_new = (board_new,num_popout_new)
-
-            cur_val = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta) #simulating the move of the next player
-
-            # print(cur_val)
+            valid_actions = get_valid_actions((player_num*2)%3, state) #player 2 moves now
+            min_val = np.inf
             
-            min_val = min(min_val, cur_val)
-            beta = min(min_val, beta)
-            if beta <= alpha: #alpha beta pruning
-                return min_val
-            
-        #print("min:",min)        
-        return min_val
+            for play_move in valid_actions:
 
+                (act_column,is_pop) = play_move
+                board, num_popout = state
+                board_new = copy.deepcopy(board)
+                num_popout_new = copy.deepcopy(num_popout)
 
-    def max_value(self, state, player_num, depth, limit, alpha, beta):
+                self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new) #simulating the board for player 2's move
+                state_new = (board_new,num_popout_new)
 
-        if depth >= limit:
-            return self.eval_function(state,player_num,"max")
+                cur_val = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) #simulating the move of the next player
+                if cur_val=="exception":
+                        raise Exception
+                    
+                if(self.time-(time.time() - start)< 0.1):
+                        raise Exception                       
     
-        valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
-        max_val = -1 * np.inf
-        
-        for play_move in valid_actions:
+                # print(cur_val)
+                
+                min_val = min(min_val, cur_val)
+                beta = min(min_val, beta)
+                if beta <= alpha: #alpha beta pruning
+                    return min_val
+                
+            #print("min:",min)        
+            return min_val
 
-            (act_column,is_pop) = play_move
-            board, num_popout = state
-            board_new = copy.deepcopy(board)
-            num_popout_new = copy.deepcopy(num_popout)
+        except Exception as e:
+            return "exception"
 
-            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
-            state_new = (board_new,num_popout_new)
 
-            cur_val = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta) # (action, value)
+
+    def max_value(self, state, player_num, depth, limit, alpha, beta, start):
+
+        try:
+            if depth >= limit:
+                return self.eval_function(state,player_num,"max")
+    
+            valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
+            max_val = -1 * np.inf
             
-            max_val = max(cur_val, max_val)
-            alpha = max(max_val, alpha)
-            if alpha >= beta: #alpha beta pruning
-                return max_val
-               
-        #print("max",max)        
-        return max_val
+            for play_move in valid_actions:
+
+                (act_column,is_pop) = play_move
+                board, num_popout = state
+                board_new = copy.deepcopy(board)
+                num_popout_new = copy.deepcopy(num_popout)
+
+                self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
+                state_new = (board_new,num_popout_new)
+
+                cur_val = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) 
+                if cur_val=="exception":
+                        raise Exception
+                    
+                if(self.time-(time.time() - start)< 0.1):
+                        raise Exception
+                
+                max_val = max(cur_val, max_val)
+                alpha = max(max_val, alpha)
+                if alpha >= beta: #alpha beta pruning
+                    return max_val
+                
+            #print("max",max)        
+            return max_val
+
+        except Exception as e:
+            return "exception"
+        
 
     def terminal_test(self, state, player_num):
         valid_actions = get_valid_actions((player_num*2)%3, state)
@@ -152,10 +171,16 @@ class AIPlayer:
         opt_action = valid_actions[0]
         limit = 1
 
+        board, num_popout = state
+        no_of_moves = np.count_nonzero(board==0)
+        total_moves = no_of_moves + num_popout[1].get_int() + num_popout[2].get_int()
+
         while True:
             limit += 1
-
+            
             try :
+                if limit>total_moves:
+                    raise Exception
 
             # for limit in range(5):
 
@@ -171,12 +196,15 @@ class AIPlayer:
                     self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
                     state_new = board_new, num_popout_new
 
-                    new_min = self.min_value(state_new, self.player_number, 0, limit, -np.inf, np.inf)
+
+                    new_min = self.min_value(state_new, self.player_number, 0, limit, -np.inf, np.inf, start)
                     
-                    if((time.time() - start.time() )< 0.01):
+                    if new_min=="exception":
                         raise Exception
-
-
+                    
+                    if(self.time-(time.time() - start)< 0.1):
+                        raise Exception
+                    
                     if  new_min > min_val:
                         opt_action_curr = play_move
                         min_val = new_min
@@ -188,7 +216,11 @@ class AIPlayer:
                 min_val = new_min
             
             except Exception as e :
+                end = time.time()
+                print("limit:", limit)
+                print(opt_action, "Time :", round(end - start,6),"secs")
                 return opt_action
+
         
         end = time.time()
         print(opt_action, "Time :", round(end - start,6),"secs")
@@ -199,42 +231,104 @@ class AIPlayer:
 
         # raise NotImplementedError('Whoops I don\'t know what to do')
 
+    def eval_function_expectimax(self, state, player_num, s):
 
+        # if s=="min":
+        #     #print("eval : ", get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]))
+        #     return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
+        # else:
+        #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
+        #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
+        return get_pts(player_num,state[0]) - 2*get_pts((player_num*2)%3, state[0])
+
+    def max_value_expectimax(self, state, player_num, depth, limit, alpha, beta, start):
+
+        try:
+            if depth >= limit:
+                return self.eval_function_expectimax(state,player_num,"max")
+    
+            valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
+            max_val = -1 * np.inf
             
-    def do_player_move_random(self, state, player_num):
+            for play_move in valid_actions:
 
-        valid_actions = get_valid_actions(player_num, state)
-        board, num_popouts = state
-        cumulative_benefit = 0
+                (act_column,is_pop) = play_move
+                board, num_popout = state
+                board_new = copy.deepcopy(board)
+                num_popout_new = copy.deepcopy(num_popout)
 
-        for play_move in valid_actions:
+                self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
+                state_new = (board_new,num_popout_new)
 
-            (act_column,is_pop) = play_move
-            board, num_popout = state
-            board_new = copy.deepcopy(board)
-            num_popout_new = copy.deepcopy(num_popout)
+                cur_val = self.do_player_move_random(state_new, self.player_number, depth+1, limit, alpha, beta, start) 
 
-            self.simulate_board(act_column, player_num, is_pop, board_new, num_popout)
-            state_new = board_new, num_popout_new
+                if cur_val=="exception":
+                        raise Exception
+                    
+                if(self.time-(time.time() - start)< 0.1):
+                        raise Exception
+                
+                max_val = max(cur_val, max_val)
+                alpha = max(max_val, alpha)
+                if alpha >= beta: #alpha beta pruning
+                    return max_val
+                
+            #print("max",max)        
+            return max_val
 
-            Score_ai = get_pts(self.player_number, board_new)
+        except Exception as e:
+            return "exception"
+            
+    def do_player_move_random(self, state, player_num, depth, limit, alpha, beta, start):
 
-            if(self.player_number == 1):
-                Score_random = get_pts(2, board_new)
-            else:
-                Score_random = get_pts(1, board_new)
+        try:
 
-            cumulative_benefit += Score_ai - 2*Score_random
+            if depth >= limit:
+                return self.eval_function_expectimax(state,player_num,"max")
 
-            if Score_ai==0:
-                percentage=cumulative_benefit
-            else:
-                percentage=cumulative_benefit/Score_ai
+            valid_actions = get_valid_actions((player_num*2)%3, state)
+            board, num_popouts = state
+            cumulative_benefit = 0
 
-        print("Percent margin cumulative for player 2:",percentage*100)
-        print("Benefit cumulative for player 2:",cumulative_benefit)
+            for play_move in valid_actions:
 
-        return cumulative_benefit
+                (act_column,is_pop) = play_move
+                board, num_popout = state
+                board_new = copy.deepcopy(board)
+                num_popout_new = copy.deepcopy(num_popout)
+
+                self.simulate_board(act_column, player_num, is_pop, board_new, num_popout)
+                state_new = board_new, num_popout_new
+
+                cur_val = self.max_value_expectimax(state_new, self.player_number, depth+1, limit, alpha, beta, start) 
+
+                if cur_val=="exception":
+                    raise Exception
+                        
+                if(self.time-(time.time() - start)< 0.1):
+                    raise Exception
+                    
+                cumulative_benefit += cur_val
+
+            # print("Benefit cumulative for player 2:",cumulative_benefit)
+
+            return cumulative_benefit
+
+        except Exception as e:
+            return "exception"
+                # if(self.player_number == 1):
+                #     Score_random = get_pts(2, board_new)
+                # else:
+                #     Score_random = get_pts(1, board_new)
+
+                # cumulative_benefit += Score_ai - 2*Score_random
+
+                # if Score_ai==0:
+                #     percentage=cumulative_benefit
+                # else:
+                #     percentage=cumulative_benefit/Score_ai
+
+            # print("Percent margin cumulative for player 2:",percentage*100)
             # if(Score_ai - Score_random > cmax):
             #     opt_action, opt_is_pop = act_column, is_pop
 
@@ -261,46 +355,72 @@ class AIPlayer:
         """
 
         # Do the rest of your implementation here
+        start = time.time()
 
         valid_actions = get_valid_actions(self.player_number, state)
-        cmax = 0
-        print(valid_actions)
-        opt_action, opt_is_pop = valid_actions[0]
+        min_val = -1 * np.inf
+        opt_action = valid_actions[0]
+        limit = 1
 
-        for play_move in valid_actions:
+        board, num_popout = state
+        no_of_moves = np.count_nonzero(board == 0)
+        total_moves = no_of_moves + num_popout[1].get_int() + num_popout[2].get_int()
 
-            (act_column,is_pop) = play_move
-            board, num_popout = state
-            board_new = copy.deepcopy(board)
-            num_popout_new = copy.deepcopy(num_popout)
+        while True:
+            limit += 1
+            
+            try :
+                if limit > total_moves:
+                    print(limit, total_moves)
+                    raise Exception
 
-            self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
-            state_new = board_new, num_popout_new
+                min_val = -1 * np.inf
 
-            if(self.player_number == 1):
-                cumulative_benefit = self.do_player_move_random(state_new, 2)
-            else:
-                cumulative_benefit = self.do_player_move_random(state_new, 1)
+                for play_move in valid_actions:
 
-            Score_ai = get_pts(self.player_number, board_new)
+                    (act_column,is_pop) = play_move
+                    board, num_popout = state
+                    board_new = copy.deepcopy(board)
+                    num_popout_new = copy.deepcopy(num_popout)
 
-            if(self.player_number == 1):
-                Score_random = get_pts(2, board_new)
-            else:
-                Score_random = get_pts(1, board_new)
+                    self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
+                    state_new = board_new, num_popout_new
 
-            print("Score difference for player 1:",Score_ai - Score_random)
+                    cumulative_benefit = self.do_player_move_random(state_new, self.player_number, 0, limit, -np.inf, np.inf, start)
 
-            if Score_random == 0 :
-                Score_random = 1
+                    if cumulative_benefit == "exception":
+                        raise Exception
+                    
+                    if(self.time-(time.time() - start)< 0.1):
+                        raise Exception
 
-            if(cumulative_benefit/Score_random > cmax):
-                opt_action, opt_is_pop = act_column, is_pop
-                cmax = cumulative_benefit/Score_random
+                    Score_random = get_pts((self.player_number*2)%3, board_new)
 
-        action, is_popout =  opt_action, opt_is_pop
-        # time.sleep(1)
+                    # print("Score difference for player 1:",cumulative_benefit - Score_random)
 
-        return action, is_popout
+                    if Score_random == 0 :
+                        Score_random = 1
+
+                    if(cumulative_benefit/Score_random > min_val):
+                        opt_action_curr = play_move
+                        min_val = cumulative_benefit/Score_random
+
+                # action, is_popout =  opt_action, opt_is_pop
+                # time.sleep(1)
+                #if this depth could be completed
+                opt_action = opt_action_curr
+                # min_val = 
+
+            except Exception as e :
+                end = time.time()
+                print("limit:", limit)
+                print(opt_action, "Time :", round(end - start,6),"secs")
+                return opt_action
+
+        
+        end = time.time()
+        print(opt_action, "Time :", round(end - start,6),"secs")
+
+        return opt_action
 
         # raise NotImplementedError('Whoops I don\'t know what to do')
