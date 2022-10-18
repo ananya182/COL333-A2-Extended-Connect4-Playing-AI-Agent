@@ -59,12 +59,17 @@ class AIPlayer:
         #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
         initial_heuristic = 0
         board = state[0]
+        num_popouts=state[1]
         n,m = np.shape(state[0])
         board_size = n*m
         points_plyer = get_pts(self.player_number,state[0])
         points_oppnt = get_pts((self.player_number*2)%3, state[0])
 
         heuristic = initial_heuristic
+        if board_size>40:
+            importance=0.5
+        else:
+            importance=0.25
 
         if(no_of_moves > (n*m*3)//4): #Dealing with the important columns, which aid in getting score on both sides of the board
             imp_columns = [i for i in range((m//2) - 1,(m//2) + 1 + 1)] #central columns
@@ -77,9 +82,24 @@ class AIPlayer:
                         count_imp_cols += 1
                         # print("count_elem",count_imp_cols)
             
-            heuristic += count_imp_cols*(no_of_moves**(0.25))
+            heuristic += count_imp_cols*(no_of_moves**importance)
 
-        
+        if(no_of_moves > (n*m)//4 and no_of_moves < (n*m*3)//4):
+            pop_out_heuristic = 3*num_popouts[self.player_number].get_int()
+            heuristic -= pop_out_heuristic
+
+        # for col in range(m):
+        #         # print("step 1")
+        #         f=1
+        #         for elem in board[n-1,col:col+4]:
+        #             if elem!=(self.player_number*2)%3:
+        #                 f-=1
+        #                 break
+        #         if f:
+        #             for elem in board[n-2,col:col+4]:
+        #                 if elem==self.player_number:
+
+
 
         if(no_of_moves > (n*m)/2): #Since at the later stage of the game we should focus more on preventing the opponent from scoring
             start_heuristic =  points_plyer - 3*points_oppnt
@@ -251,8 +271,10 @@ class AIPlayer:
                     print("Limit:",limit,"Move:",play_move, new_min)
                     print(myboard,"\n")
                     # print(state_new[0])
+                    if self.player_number not in board[:,act_column] and is_pop:
+                        continue
                     
-                    if  new_min > min_val:
+                    elif new_min > min_val:
                         opt_action_curr = play_move
                         min_val = new_min
                     # print("New min:", new_min)
