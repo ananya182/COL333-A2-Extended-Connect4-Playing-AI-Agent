@@ -15,7 +15,7 @@ all:
 7 :
 	python3 -m connect4.ConnectFour random ai connect4/initial_states/case4.txt --time 5
 8 :
-	python3 -m connect4.ConnectFour human ai connect4/initial_states/case4.txt --time 5
+	python3 -m connect4.ConnectFour human ai connect4/initial_states/case4.txt --time 3
 9 :
 	python3 -m connect4.ConnectFour ai human connect4/initial_states/case4.txt --time 3
 10 :
