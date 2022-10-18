@@ -115,10 +115,11 @@ class Game:
             # wait 0.01 sec in between
             sleep(0.01)
             if self.game_over:
-                with open('logs.txt', 'w') as log_file:
+                with open('logss.txt', 'a') as log_file:
                     s = 'Game Over\n'
                     s += f'Player 1 Score: {get_pts(1, self.state[0])}\n'
                     s += f'Player 2 Score: {get_pts(2, self.state[0])}\n'
+                    s += args.player1 + " " + args.player2 + " " + args.start_file + " " + str(args.time) + "\n" + str(round(get_pts(1, self.state[0])/get_pts(2, self.state[0]), 6)) + " " + str(round(get_pts(2, self.state[0])/get_pts(1, self.state[0]),6)) + "\n"
                     log_file.write(s)
                     print(s)
                 break
@@ -163,8 +164,8 @@ class Game:
                 log_action = {'player': current_player.player_number, 'move': int(move), 'is_pop': is_popout}
 
             # Log: Writing action to log file
-            with open('logs.txt', 'a') as log_file:
-                log_file.write(json.dumps(log_action) + '\n')
+            # with open('logs.txt', 'a') as log_file:
+            #     log_file.write(json.dumps(log_action) + '\n')
 
             self.current_turn = int(not self.current_turn)
 
@@ -215,7 +216,9 @@ class Game:
         s += f'Player 2 Score: {get_pts(2, self.state[0])}\n'
         s += "-"*25
         s += "\n"
+
         print(s)
+
 
 
 def get_start_board(file_pth: str) -> Tuple[int, np.array]:

@@ -1,0 +1,52 @@
+Player 1 Score: 0
+Player 2 Score: 0
+-------------------------
+
+Game Over
+Player 1 Score: 49
+Player 2 Score: 35
+ai ai connect4/initial_states/case4.txt 5
+Game Over
+Player 1 Score: 41
+Player 2 Score: 71
+ai sec_ai connect4/initial_states/case4.txt 5
+Game Over
+Player 1 Score: 39
+Player 2 Score: 69
+sec_ai ai connect4/initial_states/case4.txt 5
+Game Over
+Player 1 Score: 152
+Player 2 Score: 158
+ai ai connect4/initial_states/case3.txt 5
+Game Over
+Player 1 Score: 196
+Player 2 Score: 204
+ai sec_ai connect4/initial_states/case3.txt 5
+Game Over
+Player 1 Score: 120
+Player 2 Score: 209
+ai ai connect4/initial_states/case1.txt 5
+Game Over
+Player 1 Score: 194
+Player 2 Score: 294
+sec_ai ai connect4/initial_states/case3.txt 5
+Game Over
+Player 1 Score: 170
+Player 2 Score: 179
+ai sec_ai connect4/initial_states/case1.txt 5
+Game Over
+Player 1 Score: 245
+Player 2 Score: 116
+sec_ai ai connect4/initial_states/case1.txt 5
+Game Over
+Player 1 Score: 217
+Player 2 Score: 292
+sec_ai ai connect4/initial_states/case2.txt 5
+Game Over
+Player 1 Score: 185
+Player 2 Score: 142
+ai ai connect4/initial_states/case2.txt 5
+Game Over
+Player 1 Score: 278
+Player 2 Score: 273
+ai sec_ai connect4/initial_states/case2.txt 5
