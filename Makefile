@@ -20,5 +20,9 @@ all:
 	python3 -m connect4.ConnectFour ai human connect4/initial_states/case4.txt --time 3
 10 :
 	python3 -m connect4.ConnectFour ai human connect4/initial_states/case1.txt --time 3
+11 :
+	python3 -m connect4.ConnectFour ai sec_ai connect4/initial_states/case4.txt --time 3
+12 :
+	python3 -m connect4.ConnectFour sec_ai ai connect4/initial_states/case4.txt --time 3
 clean:
 	-rm *.pyc

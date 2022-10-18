@@ -7,7 +7,7 @@ from typing import List, Tuple, Dict
 from connect4.utils import get_pts, get_valid_actions, Integer
 
 
-class AIPlayer:
+class AIPlayer2:
     def __init__(self, player_number: int, time: int):
         """
         :param player_number: Current player number
@@ -49,7 +49,7 @@ class AIPlayer:
                 err = 'Invalid move by player {}. Column {}'.format(player_num, column)
                 raise Exception(err)
 # -------------------------------------------------------------------------------------------------------------------------------- 
-    def eval_function(self, state, no_of_moves, s):
+    def eval_function(self, state, player_num, s):
 
         # if s=="min":
         #     #print("eval : ", get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]))
@@ -57,25 +57,12 @@ class AIPlayer:
         # else:
         #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
         #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
-
-        n,m = np.shape(state[0])
-        board_size = n*m
-        points_plyer = get_pts(self.player_number,state[0])
-        points_oppnt = get_pts((self.player_number*2)%3, state[0])
-
-        if(no_of_moves > (n*m)/2):
-            start_heuristic =  points_plyer - 3*points_oppnt
-            heuristic = start_heuristic
-        else:
-            later_heuristic = 3*points_plyer - points_oppnt
-            heuristic = later_heuristic
-        # heuristic = 3*get_pts(self.player_number,state[0]) - get_pts((self.player_number*2)%3, state[0]) 
-        return heuristic
+        return 3*get_pts(self.player_number,state[0]) - get_pts((self.player_number*2)%3, state[0]) 
     
-    def min_value(self, state, player_num, depth, limit, alpha, beta, start, no_of_moves):
+    def min_value(self, state, player_num, depth, limit, alpha, beta, start):
         try:
             if depth >= limit:
-                return self.eval_function(state, no_of_moves, "min"), state[0]
+                return self.eval_function(state, self.player_number, "min"), state[0]
         
             valid_actions = get_valid_actions((self.player_number*2)%3, state) #player 2 moves now
             min_val = np.inf
@@ -97,7 +84,7 @@ class AIPlayer:
                 #     print("Score diff:",self.eval_function(state_new, self.player_number, "min"),"Limit:",depth+1)
                 #     # time.sleep(0.1)
                 #     print("\n")
-                cur_val, myboard = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start, no_of_moves-1) #simulating the move of the next player
+                cur_val, myboard = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) #simulating the move of the next player
                 # print("cur_val:",cur_val,myboard)
 
                 if cur_val=="exception":
@@ -120,11 +107,11 @@ class AIPlayer:
         except Exception as e:
             return "exception", out_board
 
-    def max_value(self, state, player_num, depth, limit, alpha, beta, start, no_of_moves):
+    def max_value(self, state, player_num, depth, limit, alpha, beta, start):
 
         try:
             if depth >= limit:
-                return self.eval_function(state,no_of_moves,"max"), state[0]
+                return self.eval_function(state,player_num,"max"), state[0]
     
             valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
             max_val = -1 * np.inf
@@ -146,7 +133,7 @@ class AIPlayer:
                 #     # time.sleep(0.1)
                 #     print("\n")
 
-                cur_val, myboard = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start, no_of_moves - 1)
+                cur_val, myboard = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start)
                 # state_new = (board_new,num_popout_new) 
 
                 if cur_val=="exception":
@@ -222,7 +209,7 @@ class AIPlayer:
                     self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
                     state_new = board_new, num_popout_new
 
-                    new_min, myboard = self.min_value(state_new, self.player_number, 1, limit, -np.inf, np.inf, start, total_moves)
+                    new_min, myboard = self.min_value(state_new, self.player_number, 1, limit, -np.inf, np.inf, start)
                     
                     if new_min=="exception":
                         raise Exception
@@ -231,7 +218,7 @@ class AIPlayer:
                         raise Exception
 
                     print("Limit:",limit,"Move:",play_move, new_min)
-                    print(myboard,"\n")
+                    # print(myboard,"\n")
                     # print(state_new[0])
                     
                     if  new_min > min_val:
