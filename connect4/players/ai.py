@@ -57,15 +57,16 @@ class AIPlayer:
         # else:
         #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
         #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
-        return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]) 
+        return 3*get_pts(self.player_number,state[0]) - get_pts((self.player_number*2)%3, state[0]) 
     
     def min_value(self, state, player_num, depth, limit, alpha, beta, start):
         try:
             if depth >= limit:
-                return self.eval_function(state, self.player_number, "min")
+                return self.eval_function(state, self.player_number, "min"), state[0]
         
-            valid_actions = get_valid_actions((player_num*2)%3, state) #player 2 moves now
+            valid_actions = get_valid_actions((self.player_number*2)%3, state) #player 2 moves now
             min_val = np.inf
+            out_board = state[0]
             
             for play_move in valid_actions:
 
@@ -74,10 +75,18 @@ class AIPlayer:
                 board_new = copy.deepcopy(board)
                 num_popout_new = copy.deepcopy(num_popout)
 
-                self.simulate_board(act_column, (player_num*1)%3, is_pop, board_new, num_popout_new) #simulating the board for player 2's move
+                self.simulate_board(act_column, (self.player_number*2)%3, is_pop, board_new, num_popout_new) #simulating the board for player 2's move
                 state_new = (board_new,num_popout_new)
+                # print("hello")
 
-                cur_val = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) #simulating the move of the next player
+                # if(depth == limit - 1):
+                #     print(board_new)
+                #     print("Score diff:",self.eval_function(state_new, self.player_number, "min"),"Limit:",depth+1)
+                #     # time.sleep(0.1)
+                #     print("\n")
+                cur_val, myboard = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) #simulating the move of the next player
+                # print("cur_val:",cur_val,myboard)
+
                 if cur_val=="exception":
                     raise Exception
                     
@@ -85,26 +94,28 @@ class AIPlayer:
                     raise Exception                       
     
                 # print(cur_val)
-                
                 min_val = min(min_val, cur_val)
+                if(min_val == cur_val):
+                    out_board = myboard
                 beta = min(min_val, beta)
                 if beta <= alpha: #alpha beta pruning
-                    return min_val
+                    return min_val, out_board
                 
             #print("min:",min)        
-            return min_val
+            return min_val, out_board
 
         except Exception as e:
-            return "exception"
+            return "exception", out_board
 
     def max_value(self, state, player_num, depth, limit, alpha, beta, start):
 
         try:
             if depth >= limit:
-                return self.eval_function(state,player_num,"max")
+                return self.eval_function(state,player_num,"max"), state[0]
     
             valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
             max_val = -1 * np.inf
+            out_board = state[0]
             
             for play_move in valid_actions:
 
@@ -116,7 +127,15 @@ class AIPlayer:
                 self.simulate_board(act_column, player_num, is_pop, board_new, num_popout_new)
                 state_new = (board_new,num_popout_new)
 
-                cur_val = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) 
+                # if(depth == limit - 1):
+                #     print(board_new)
+                #     print("Score diff:",self.eval_function(state_new, self.player_number, "min"),"Depth:",depth)
+                #     # time.sleep(0.1)
+                #     print("\n")
+
+                cur_val, myboard = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start)
+                # state_new = (board_new,num_popout_new) 
+
                 if cur_val=="exception":
                         raise Exception
                     
@@ -124,15 +143,17 @@ class AIPlayer:
                         raise Exception
                 
                 max_val = max(cur_val, max_val)
+                if(cur_val == max_val):
+                    out_board = myboard
                 alpha = max(max_val, alpha)
                 if alpha >= beta: #alpha beta pruning
-                    return max_val
+                    return max_val, out_board
                 
             #print("max",max)        
-            return max_val
+            return max_val, out_board
 
         except Exception as e:
-            return "exception"    
+            return "exception", out_board    
 
     def terminal_test(self, state, player_num):
         valid_actions = get_valid_actions((player_num*2)%3, state)
@@ -162,22 +183,21 @@ class AIPlayer:
         valid_actions = get_valid_actions(self.player_number, state)
         min_val = -1 * np.inf
         opt_action = valid_actions[0]
-        limit = 1
+        limit = 0
 
         board, num_popout = state
-        no_of_moves = np.count_nonzero(board==0)
+        no_of_moves = np.count_nonzero(board == 0)
         total_moves = no_of_moves + num_popout[1].get_int() + num_popout[2].get_int()
 
         while True:
             limit += 1
             
             try :
-                if limit>total_moves:
+                if limit > total_moves:
                     raise Exception
 
-            # for limit in range(5):
-
                 min_val = -1 * np.inf
+                print("Limit:", limit)
 
                 for play_move in valid_actions:
                     
@@ -189,14 +209,17 @@ class AIPlayer:
                     self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
                     state_new = board_new, num_popout_new
 
-
-                    new_min = self.min_value(state_new, self.player_number, 0, limit, -np.inf, np.inf, start)
+                    new_min, myboard = self.min_value(state_new, self.player_number, 1, limit, -np.inf, np.inf, start)
                     
                     if new_min=="exception":
                         raise Exception
                     
                     if(self.time-(time.time() - start)< 0.1):
                         raise Exception
+
+                    print("Limit:",limit,"Move:",play_move, new_min)
+                    print(myboard,"\n")
+                    # print(state_new[0])
                     
                     if  new_min > min_val:
                         opt_action_curr = play_move
