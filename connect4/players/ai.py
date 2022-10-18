@@ -57,18 +57,36 @@ class AIPlayer:
         # else:
         #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
         #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
-
+        initial_heuristic = 0
+        board = state[0]
         n,m = np.shape(state[0])
         board_size = n*m
         points_plyer = get_pts(self.player_number,state[0])
         points_oppnt = get_pts((self.player_number*2)%3, state[0])
 
-        if(no_of_moves > (n*m)/2):
+        heuristic = initial_heuristic
+
+        if(no_of_moves > (n*m*3)//4): #Dealing with the important columns, which aid in getting score on both sides of the board
+            imp_columns = [i for i in range((m//2) - 1,(m//2) + 1 + 1)] #central columns
+            count_imp_cols = 0
+
+            for col in imp_columns:
+                # print("step 1")
+                for elem in board[:,col]:
+                    if(elem == self.player_number):
+                        count_imp_cols += 1
+                        # print("count_elem",count_imp_cols)
+            
+            heuristic += count_imp_cols*(no_of_moves**(0.25))
+
+        
+
+        if(no_of_moves > (n*m)/2): #Since at the later stage of the game we should focus more on preventing the opponent from scoring
             start_heuristic =  points_plyer - 3*points_oppnt
-            heuristic = start_heuristic
+            heuristic += start_heuristic
         else:
             later_heuristic = 3*points_plyer - points_oppnt
-            heuristic = later_heuristic
+            heuristic += later_heuristic
         # heuristic = 3*get_pts(self.player_number,state[0]) - get_pts((self.player_number*2)%3, state[0]) 
         return heuristic
     
