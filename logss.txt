@@ -1,0 +1,251 @@
+Game Over
+Player 1 Score: 35
+Player 2 Score: 39
+sec_ai ai connect4/initial_states/case4.txt 5
+0.897436 1.114286
+Game Over
+Player 1 Score: 43
+Player 2 Score: 55
+ai ai connect4/initial_states/case4.txt 5
+0.781818 1.27907
+Game Over
+Player 1 Score: 50
+Player 2 Score: 63
+ai sec_ai connect4/initial_states/case4.txt 5
+0.793651 1.26
+
+Game Over
+Player 1 Score: 116
+Player 2 Score: 112
+ai sec_ai connect4/initial_states/case3.txt 5
+1.035714 0.965517
+Game Over
+Player 1 Score: 135
+Player 2 Score: 131
+ai ai connect4/initial_states/case3.txt 5
+1.030534 0.97037
+Game Over
+Player 1 Score: 144
+Player 2 Score: 163
+sec_ai ai connect4/initial_states/case3.txt 5
+0.883436 1.131944
+
+Game Over
+Player 1 Score: 117
+Player 2 Score: 143
+sec_ai ai connect4/initial_states/case1.txt 5
+0.818182 1.222222
+Game Over
+Player 1 Score: 138
+Player 2 Score: 79
+ai sec_ai connect4/initial_states/case1.txt 5
+1.746835 0.572464
+Game Over
+Player 1 Score: 108
+Player 2 Score: 117
+ai ai connect4/initial_states/case1.txt 5
+0.923077 1.083333
+
+Game Over
+Player 1 Score: 243
+Player 2 Score: 280
+sec_ai ai connect4/initial_states/case2.txt 5
+0.867857 1.152263
+Game Over
+Player 1 Score: 92
+Player 2 Score: 261
+ai ai connect4/initial_states/case2.txt 5
+0.35249 2.836957
+Game Over
+Player 1 Score: 198
+Player 2 Score: 228
+ai sec_ai connect4/initial_states/case2.txt 5
+0.868421 1.151515
+
+--------------------------------------------------------------------------------------------
+Game Over
+Player 1 Score: 46
+Player 2 Score: 39
+ai sec_ai connect4/initial_states/case4.txt 5
+1.179487 0.847826
+Game Over
+Player 1 Score: 38
+Player 2 Score: 57
+ai ai connect4/initial_states/case4.txt 5
+0.666667 1.5
+Game Over
+Player 1 Score: 49
+Player 2 Score: 68
+sec_ai ai connect4/initial_states/case4.txt 5
+0.720588 1.387755
+
+Game Over
+Player 1 Score: 181
+Player 2 Score: 131
+ai sec_ai connect4/initial_states/case3.txt 5
+1.381679 0.723757
+Game Over
+Player 1 Score: 216
+Player 2 Score: 226
+ai ai connect4/initial_states/case3.txt 5
+0.955752 1.046296
+Game Over
+Player 1 Score: 167
+Player 2 Score: 260
+sec_ai ai connect4/initial_states/case3.txt 5
+0.642308 1.556886
+
+Game Over
+Player 1 Score: 86
+Player 2 Score: 129
+sec_ai ai connect4/initial_states/case1.txt 5
+0.666667 1.5
+Game Over
+Player 1 Score: 131
+Player 2 Score: 87
+ai sec_ai connect4/initial_states/case1.txt 5
+1.505747 0.664122
+Game Over
+Player 1 Score: 82
+Player 2 Score: 165
+ai ai connect4/initial_states/case1.txt 5
+0.49697 2.012195
+
+Game Over
+Player 1 Score: 47
+Player 2 Score: 47
+ai sec_ai connect4/initial_states/case4.txt 5
+1.0 1.0
+
+-----------------------------------------------------------------------------------------------------------Game Over
+Player 1 Score: 35
+Player 2 Score: 39
+sec_ai ai connect4/initial_states/case4.txt 5
+0.897436 1.114286
+Game Over
+Player 1 Score: 48
+Player 2 Score: 39
+ai sec_ai connect4/initial_states/case4.txt 5
+1.230769 0.8125
+Game Over
+Player 1 Score: 32
+Player 2 Score: 40
+ai ai connect4/initial_states/case4.txt 5
+0.8 1.25
+Game Over
+Player 1 Score: 167
+Player 2 Score: 200
+sec_ai ai connect4/initial_states/case3.txt 5
+0.835 1.197605
+Game Over
+Player 1 Score: 255
+Player 2 Score: 287
+ai ai connect4/initial_states/case3.txt 5
+0.888502 1.12549
+Game Over
+Player 1 Score: 157
+Player 2 Score: 116
+ai sec_ai connect4/initial_states/case3.txt 5
+1.353448 0.738854
+
+Game Over
+Player 1 Score: 86
+Player 2 Score: 129
+sec_ai ai connect4/initial_states/case1.txt 5
+0.666667 1.5
+Game Over
+Player 1 Score: 132
+Player 2 Score: 96
+ai sec_ai connect4/initial_states/case1.txt 5
+1.375 0.727273
+Game Over
+Player 1 Score: 67
+Player 2 Score: 175
+ai ai connect4/initial_states/case1.txt 5
+0.382857 2.61194
+
+Game Over
+Player 1 Score: 220
+Player 2 Score: 261
+sec_ai ai connect4/initial_states/case2.txt 5
+0.842912 1.186364
+Game Over
+Player 1 Score: 334
+Player 2 Score: 275
+ai sec_ai connect4/initial_states/case2.txt 5
+1.214545 0.823353
+
+Game Over
+Player 1 Score: 274
+Player 2 Score: 379
+ai ai connect4/initial_states/case2.txt 5
+0.722955 1.383212
+
+--------------------------------------------------------------------------------------------------------------Game Over
+Player 1 Score: 35
+Player 2 Score: 39
+sec_ai ai connect4/initial_states/case4.txt 5
+0.897436 1.114286
+Game Over
+Player 1 Score: 46
+Player 2 Score: 39
+ai sec_ai connect4/initial_states/case4.txt 5
+1.179487 0.847826
+Game Over
+Player 1 Score: 38
+Player 2 Score: 57
+ai ai connect4/initial_states/case4.txt 5
+0.666667 1.5
+
+Game Over
+Player 1 Score: 167
+Player 2 Score: 200
+sec_ai ai connect4/initial_states/case3.txt 5
+0.835 1.197605
+Game Over
+Player 1 Score: 167
+Player 2 Score: 135
+ai sec_ai connect4/initial_states/case3.txt 5
+1.237037 0.808383
+Game Over
+Player 1 Score: 253
+Player 2 Score: 267
+ai ai connect4/initial_states/case3.txt 5
+0.947566 1.055336
+
+Game Over
+Player 1 Score: 86
+Player 2 Score: 129
+sec_ai ai connect4/initial_states/case1.txt 5
+0.666667 1.5
+Game Over
+Player 1 Score: 131
+Player 2 Score: 87
+ai sec_ai connect4/initial_states/case1.txt 5
+1.505747 0.664122
+Game Over
+Player 1 Score: 82
+Player 2 Score: 165
+ai ai connect4/initial_states/case1.txt 5
+0.49697 2.012195
+
+Game Over
+Player 1 Score: 220
+Player 2 Score: 261
+sec_ai ai connect4/initial_states/case2.txt 5
+0.842912 1.186364
+Game Over
+Player 1 Score: 248
+Player 2 Score: 337
+ai sec_ai connect4/initial_states/case2.txt 5
+0.735905 1.358871
+Game Over
+Player 1 Score: 337
+Player 2 Score: 419
+ai ai connect4/initial_states/case2.txt 5
+0.804296 1.243323
+Game Over
+Player 1 Score: 155
+Player 2 Score: 127
+ai sec_ai connect4/initial_states/case2.txt 5
+1.220472 0.819355

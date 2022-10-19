@@ -171,7 +171,7 @@ class Game:
 
             self.current.configure(text=f'cur: {self.players[self.current_turn].player_string}, ')
             self.player1_string.configure(text=f'player1: {get_pts(1, self.state[0])}, '
-                                               f'popout left: {self.state[1][1].get_int()}')
+                                               f'popout left: {self.state[1][1].get_int()}' )
             self.player2_string.configure(text=f' player2: {get_pts(2, self.state[0])}, '
                                                f'popout left: {self.state[1][2].get_int()}')
 
