@@ -66,7 +66,7 @@ class AIPlayer:
         points_oppnt = get_pts((self.player_number*2)%3, state[0])
 
         heuristic = initial_heuristic
-        if board_size>40:
+        if board_size > 40:
             importance=0.5
         else:
             importance=0.25
@@ -317,7 +317,7 @@ class AIPlayer:
         # else:
         #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
         #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
-        return get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0])
+        return (get_pts(player_num,state[0]) - 3*get_pts((player_num*2)%3, state[0]))
 
     def max_value_expectimax(self, state, player_num, depth, limit, alpha, beta, start):
 
