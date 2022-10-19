@@ -49,7 +49,7 @@ class AIPlayer2:
                 err = 'Invalid move by player {}. Column {}'.format(player_num, column)
                 raise Exception(err)
 # -------------------------------------------------------------------------------------------------------------------------------- 
-    def eval_function(self, state, player_num, s):
+    def eval_function(self, state, no_of_moves, s):
 
         # if s=="min":
         #     #print("eval : ", get_pts(player_num,state[0]) - get_pts((player_num*2)%3, state[0]))
@@ -57,12 +57,73 @@ class AIPlayer2:
         # else:
         #     #print("eval : ", get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0]))
         #     return get_pts((player_num*2)%3, state[0]) - get_pts(player_num,state[0])
-        return get_pts(self.player_number,state[0]) - get_pts((self.player_number*2)%3, state[0]) 
+        initial_heuristic = 0
+        board = state[0]
+        num_popouts=state[1]
+        n,m = np.shape(state[0])
+        board_size = n*m
+        points_plyer = get_pts(self.player_number,state[0])
+        points_oppnt = get_pts((self.player_number*2)%3, state[0])
+
+        heuristic = initial_heuristic
+        if board_size>40:
+            importance=0.5
+        else:
+            importance=0.25
+
+        if(no_of_moves > (n*m*3)//4): #Dealing with the important columns, which aid in getting score on both sides of the board
+            imp_columns = [i for i in range((m//2) - 1,(m//2) + 1 + 1)] #central columns
+            count_imp_cols = 0
+
+            for col in imp_columns:
+                # print("step 1")
+                for elem in board[:,col]:
+                    if(elem == self.player_number):
+                        count_imp_cols += 1
+                        # print("count_elem",count_imp_cols)
+            
+            heuristic += count_imp_cols*(no_of_moves**importance)
+
+        if(no_of_moves > (n*m)//4 and no_of_moves < (n*m*3)//4):
+            pop_out_heuristic = 3*num_popouts[self.player_number].get_int()
+            heuristic -= pop_out_heuristic
+
+        # for col in range(m):
+        #         # print("step 1")
+        #         f=1
+        #         for elem in board[n-1,col:col+4]:
+        #             if elem!=(self.player_number*2)%3:
+        #                 f-=1
+        #                 break
+        #         if f:
+        #             for elem in board[n-2,col:col+4]:
+        #                 if elem==self.player_number:
+
+
+
+        if(no_of_moves > (n*m)/2): #Since at the later stage of the game we should focus more on preventing the opponent from scoring
+            start_heuristic =  points_plyer - 3*points_oppnt
+            heuristic += start_heuristic
+        else:
+            later_heuristic = 3*points_plyer - points_oppnt
+            heuristic += later_heuristic
+        # heuristic = 3*get_pts(self.player_number,state[0]) - get_pts((self.player_number*2)%3, state[0]) 
+        ratio_state = (n*m)//2
+        # if(n*m >= 35 and n*m <= 50):
+        #     ratio_state = (n*m)//4
+        # else:
+        #     ratio_state = 4
+
+        # if(no_of_moves < ratio_state):
+        #     return heuristic/points_oppnt
+        # else:
+        #     return heuristic
+        return heuristic
     
-    def min_value(self, state, player_num, depth, limit, alpha, beta, start):
+    def min_value(self, state, player_num, depth, limit, alpha, beta, start, no_of_moves):
         try:
             if depth >= limit:
-                return self.eval_function(state, self.player_number, "min"), state[0]
+                return self.eval_function(state, no_of_moves, "min"), state[0]
         
             valid_actions = get_valid_actions((self.player_number*2)%3, state) #player 2 moves now
             min_val = np.inf
@@ -84,7 +145,7 @@ class AIPlayer2:
                 #     print("Score diff:",self.eval_function(state_new, self.player_number, "min"),"Limit:",depth+1)
                 #     # time.sleep(0.1)
                 #     print("\n")
-                cur_val, myboard = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start) #simulating the move of the next player
+                cur_val, myboard = self.max_value(state_new, self.player_number, depth+1, limit, alpha, beta, start, no_of_moves-1) #simulating the move of the next player
                 # print("cur_val:",cur_val,myboard)
 
                 if cur_val=="exception":
@@ -107,11 +168,11 @@ class AIPlayer2:
         except Exception as e:
             return "exception", out_board
 
-    def max_value(self, state, player_num, depth, limit, alpha, beta, start):
+    def max_value(self, state, player_num, depth, limit, alpha, beta, start, no_of_moves):
 
         try:
             if depth >= limit:
-                return self.eval_function(state,player_num,"max"), state[0]
+                return self.eval_function(state,no_of_moves,"max"), state[0]
     
             valid_actions = get_valid_actions(player_num, state) #maximizing for our own player
             max_val = -1 * np.inf
@@ -133,7 +194,7 @@ class AIPlayer2:
                 #     # time.sleep(0.1)
                 #     print("\n")
 
-                cur_val, myboard = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start)
+                cur_val, myboard = self.min_value(state_new, self.player_number, depth+1, limit, alpha, beta, start, no_of_moves - 1)
                 # state_new = (board_new,num_popout_new) 
 
                 if cur_val=="exception":
@@ -209,7 +270,7 @@ class AIPlayer2:
                     self.simulate_board(act_column, self.player_number, is_pop, board_new, num_popout_new)
                     state_new = board_new, num_popout_new
 
-                    new_min, myboard = self.min_value(state_new, self.player_number, 1, limit, -np.inf, np.inf, start)
+                    new_min, myboard = self.min_value(state_new, self.player_number, 1, limit, -np.inf, np.inf, start, total_moves)
                     
                     if new_min=="exception":
                         raise Exception
@@ -220,8 +281,10 @@ class AIPlayer2:
                     # print("Limit:",limit,"Move:",play_move, new_min)
                     # print(myboard,"\n")
                     # print(state_new[0])
+                    if self.player_number not in board[:,act_column] and is_pop:
+                        continue
                     
-                    if  new_min > min_val:
+                    elif new_min > min_val:
                         opt_action_curr = play_move
                         min_val = new_min
                     # print("New min:", new_min)
