@@ -1,0 +1,38 @@
+Ananya Mathur (2020CS50416), Ishaan Govil (2020CS50497)
+
+# INTRODUCTION
+In this assignment, we implement an AI agent for playing a two-player game with against both a random and adversarial agent.
+
+# CORE IDEAS 
+1. Expectimax agent : Implemented an expectimax AI agent to play against a random agent
+2. Intelligent agent : Implemented a minimax AI agent to play against an adversarial agent
+3. Iterative Deepening : A incremental level wise tree expansion is performed in our algorithm, similar to iterative deepening, where we increase the tree depth we explore for a move.
+4. Alpha beta pruning : Implemented alpha beta pruning in minimax search to explore our search tree to greater depths and thus increase optimality of the solution. This is greatly beneficial at larger depths where a large amount of the tree is pruned enabling us to explore more depths.
+5. Depth limited search (H-Minimax) : Since we cannot go to the terminal nodes in the search tree due to time constraint, during our level wise DFS, for each depth we explore we replace terminal utilities with an evaluation function with certain heuristics to determine the utility of that node. 
+6. Heuristic : Considered various features such as percentage score difference of AI agent and opponent, more importance of moves in central columns of game board, usage of popout moves in the middle of the game to create our evaluation function.
+7. Time management : The implementation is stopped when the time remaining is about 0.3 sec for the agent to move, instead of hard coding the max depth till which exploration takes place. This helps in searching the tree for even greater depths as the game progresses further and the search space is reduced.
+8. Depth limiting : Limiting the depth of exploration to the total no of moves that are still possible in the game to prevent unnecessary calculations
+
+# Algorithm for Expectimax agent
+1. Perform a level wise expectimax search by exploring all possible opponent moves and considering cumulative benefits (expectation value) for each move. 
+2. Keep increasing depth limit of the search by 1 till the time limit for a move exhausts and return best move (greatest cumulative benefit) discovered till now.
+3. Use eval_function_expectimax to compute non terminal node utilities when we are at the depth limit.
+4. Output the action which optimizes/maximizes the expected utility of the player
+
+# Algorithm for Minimax agent
+1. Perform a level wise minimax search and prune the search tree using alpha beta pruning wherever required.
+2. Keep increasing depth limit of the search by 1 till the time limit for a move exhausts and return best move discovered till now.
+3. Use eval_function_minimax to compute non terminal node utilities when we are at the depth limit.
+4. Output the action which optimizes/maximizes the expected utility of the player
+
+# Heuristic - Minimax agent
+1. Weighted score difference (Weighted points heuristic) : For a given state, compute the weighted score difference of the AI agent and its opponent. For the first half of the game based on number of moves remaining, the AI agent focuses on increasing its own score, thus a factor of 2 is multiplied to its score in the weighted difference. In the later half of the game, not letting the opponent score by blocking its fours and threes should be our main objective and thus the factors are swapped. We now multiply opponent’s score in the heuristic by 2 (while subtracting), thus weighing it more. 
+2. Central columns importance (Imp columns heuristic) : Greater is the presence of AI agent’s tokens in the middle 3 columns of the board, better is the state as this aids the agent in getting score on both sides of the board. Based on number of moves remaining and board size we add a factor to outr heuristic taking this condition into account.
+3. Number of popout moves remaining (popout heuristic) : The lesser the no. of popouts, the better it is for player one, as otherwise in the end it would be forced to play sub-optimal popout moves. However for player 2, the popout heuristics doesn't matter as it is not forced to play and exhaust it's pop out moves in the end, thus this heuristic is specific to player one.
+4. Ratio of score difference to opponent’s score (ratio_absolute heuristic) : Initially the points_oppnt is not big enough to consider ratios and start working with it, however in the later stages of the game, we should focus more on maximizing the winning ratio which is the objective of the game.
+
+# Heuristic - Expectimax agent
+1. Weighted score difference (Greedy-safe heuristic) : - Greedily playing on a smaller board size, as in it the random player has very less prob. of gaining points and so we weight our own points by a factor of 3.
+                                                       - Playing safe in case of larger boards as in this case the random player has very less prob of stopping our connect fours, as the action space is large, and so we should focus more on stopping the connect fours of the other random agent, i.e not letting the opponent score by blocking its fours and threes should be our main objective and thus the factors are swapped. We now multiply opponent’s score in the heuristic by 3 (while subtracting), thus weighing it more. 
+
+*This heuristic is sufficient as the delicacies of playing against an intelligent minimax agent are not involved when playing against a random agent.
